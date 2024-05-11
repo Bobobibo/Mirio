@@ -11,9 +11,12 @@ set(CMAKE_C_STANDARD 99)
 add_executable(Mirio
 
 
-        square.cpp
+
 
         AllegroBase.cpp
+
+
+        mirio.cpp
 
 
 )

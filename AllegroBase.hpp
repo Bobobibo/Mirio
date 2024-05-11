@@ -5,7 +5,7 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>
 
-const int FPS = 60;
+const int FPS = 30;
 const int SCREEN_W = 1920;
 const int SCREEN_H = 1080;
 

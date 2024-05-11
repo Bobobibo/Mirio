@@ -49,14 +49,14 @@ cmake_ninja_workdir = C$:/Users/lukam/CLionProjects/Mirio/cmake-build-debug/
 
 build cmake_object_order_depends_target_Mirio: phony || CMakeFiles/Mirio.dir
 
-build CMakeFiles/Mirio.dir/square.cpp.obj: CXX_COMPILER__Mirio_unscanned_Debug C$:/Users/lukam/CLionProjects/Mirio/square.cpp || cmake_object_order_depends_target_Mirio
-  DEP_FILE = CMakeFiles\Mirio.dir\square.cpp.obj.d
+build CMakeFiles/Mirio.dir/AllegroBase.cpp.obj: CXX_COMPILER__Mirio_unscanned_Debug C$:/Users/lukam/CLionProjects/Mirio/AllegroBase.cpp || cmake_object_order_depends_target_Mirio
+  DEP_FILE = CMakeFiles\Mirio.dir\AllegroBase.cpp.obj.d
   FLAGS = -g -std=gnu++17 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles\Mirio.dir
   OBJECT_FILE_DIR = CMakeFiles\Mirio.dir
 
-build CMakeFiles/Mirio.dir/AllegroBase.cpp.obj: CXX_COMPILER__Mirio_unscanned_Debug C$:/Users/lukam/CLionProjects/Mirio/AllegroBase.cpp || cmake_object_order_depends_target_Mirio
-  DEP_FILE = CMakeFiles\Mirio.dir\AllegroBase.cpp.obj.d
+build CMakeFiles/Mirio.dir/mirio.cpp.obj: CXX_COMPILER__Mirio_unscanned_Debug C$:/Users/lukam/CLionProjects/Mirio/mirio.cpp || cmake_object_order_depends_target_Mirio
+  DEP_FILE = CMakeFiles\Mirio.dir\mirio.cpp.obj.d
   FLAGS = -g -std=gnu++17 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles\Mirio.dir
   OBJECT_FILE_DIR = CMakeFiles\Mirio.dir
@@ -69,7 +69,7 @@ build CMakeFiles/Mirio.dir/AllegroBase.cpp.obj: CXX_COMPILER__Mirio_unscanned_De
 #############################################
 # Link the executable Mirio.exe
 
-build Mirio.exe: CXX_EXECUTABLE_LINKER__Mirio_Debug CMakeFiles/Mirio.dir/square.cpp.obj CMakeFiles/Mirio.dir/AllegroBase.cpp.obj
+build Mirio.exe: CXX_EXECUTABLE_LINKER__Mirio_Debug CMakeFiles/Mirio.dir/AllegroBase.cpp.obj CMakeFiles/Mirio.dir/mirio.cpp.obj
   FLAGS = -g
   LINK_LIBRARIES = -lallegro  -lallegro_primitives  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\Mirio.dir

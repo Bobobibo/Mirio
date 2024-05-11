@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include "AllegroBase.hpp"
 #include <windows.h>
@@ -31,7 +30,7 @@ public:
     }
     void Reset()
     {
-        d=1 + (rand() % 3);
+        d=1;
     }
     void randomColor() {
         r = rand() % 256;
@@ -39,53 +38,38 @@ public:
         b = rand() % 256;
     }
     double randomSize(){
-        s=10.0 + rand() % 30;
+        s= rand() % 1920;
         return s;
     }
-    void movef()
-    {
-        dx=dx*d;
-        dy=dy*d;
+    void movef() {
+        dx = d;
+        //dy=dy*d;
 
-        d=1;
-        x+=dx;
-        y+=dy;
+        d = 1;
+        x += dx;
+        //y+=dy;
 
-        if ((x >= SCREEN_W - 1.0))
+        /*if ((x >= SCREEN_W - 1.0))
         {
             x -= dx;
             Reset();
 
             dx=-1.0  ;
             //randomSize();
-            randomColor();
+            //randomColor();
         }else if(x  <=1.0 ){
             x -= dx;
             Reset();
 
             dx=1.0  ;
             //randomSize();
-            randomColor();
+            //randomColor();
 
-        }
-        if(y>=SCREEN_H - 1.0){
-            y -= dy;
-            Reset();
+        }*/
 
-            dy=-1.0  ;
-            //randomSize();
-            randomColor();
 
-        }else if(y <=1.0){
 
-            y -= dy;
-            Reset();
-            dy=1.0  ;
 
-            //randomSize();
-            randomColor();
-
-        }
 
 
     }
@@ -126,62 +110,40 @@ public:
     //double getSize() const override { return sx_; }
     virtual void draw()
     {
-        al_draw_filled_rectangle( x, y, x +sx_ , y +sy_,
-                                  al_map_rgb( r, g, b) );
+        al_draw_filled_rectangle( 0, 0, SCREEN_W , SCREEN_H,
+                                  al_map_rgb( 4, 156, 216) );
 
     }
 
 };
-
-class Circle : public Figure
+class Land : public Rectangle
 {
 protected:
-    double s_ = randomSize();
 
 
 public:
-    Circle(  ) ://double s
-            Figure()//,
-    //s_( s )
-    {
-    }
 
-    //double getSize() const override { return 2 * s_; }
-    virtual void draw()
-    {
-
-        al_draw_filled_circle( x, y, s_, al_map_rgb( r, g, b ) );
-    }
-};
-
-class Triangle : public Figure{
-protected:
-    double s_ = randomSize();
-
-
-public:
-    Triangle( ) ://double s
-            Figure()
-    //s_( s )
+    Land() ://double s
+            Rectangle()
     {
     }
     //double getSize() const override { return s_; }
     virtual void draw()
     {
-        al_draw_filled_triangle(x, y -s_, x + (s_ / 2), y + (s_ / 2), x - (s_ / 2), y + (s_ / 2),  al_map_rgb( r, g, b ));
 
+        al_draw_filled_rectangle( 0, SCREEN_H-200, SCREEN_W , SCREEN_H,
+                                  al_map_rgb( 67, 176, 71) );
     }
-
 };
 
-class Square : public Rectangle
+class Goomba : public Rectangle
 {
 protected:
     double s_ = randomSize();
 
 public:
 
-    Square() ://double s
+    Goomba() ://double s
             Rectangle()
     {
     }
@@ -189,14 +151,13 @@ public:
     virtual void draw()
     {
         double size=s_;
-        al_draw_filled_rectangle( x, y, x +size , y +size,
-                                  al_map_rgb( r, g, b) );
+        x = rand() % SCREEN_W;
+        y =  SCREEN_H-215;
+        al_draw_filled_rectangle( x, y, x +15 , y +15,
+                                  al_map_rgb( 150, 75, 0) );
     }
 };
-
-
-
-const int MAXF = 20;
+const int MAXF =3;
 
 class ScreenSaver
 {
@@ -228,10 +189,11 @@ public:
     }
     void Next()
     {
+
         for( int i = 0; i < size_; ++i )
         {
             figures[i]->movef();
-        }Collision();
+        }//Collision();
 
 
     }
@@ -287,28 +249,35 @@ public: void Collision() {
             }
         }
     }
+    void DrawBackground(){
+        al_draw_filled_rectangle( 0, 0, SCREEN_W , SCREEN_H,
+                                  al_map_rgb( 4, 156, 216) );
+    };
 
 };
-class ControlledSquare : public Square{
+class ControlledSquare : public Goomba{
 protected:
-    double s_ = randomSize();
+    double sy_ = 40;
+    double sx_ = 20;
     double x=0;
-    double y=0;
+    double y=SCREEN_H-240;
 public:
 
     ControlledSquare():
-            Square(){
+            Goomba(){
 
     }
     virtual void draw()
     {
-        double size=s_;
-        al_draw_filled_rectangle( x, y, x +size , y +size,
-                                  al_map_rgb( 36, 214, 182) );
+
+        double sizex=sx_;
+        double sizey=sy_;
+        al_draw_filled_rectangle( x, y, x +sizex , y+sizey,
+                                  al_map_rgb( 229, 37, 33) );
     }
 
     void CheckWin(double x, double y){
-        if((x>=SCREEN_W)&&(y>=SCREEN_H)){
+        if((x>=SCREEN_W)){
             cout<<"YOU WON"<<endl;
         }
     }
@@ -343,21 +312,16 @@ public:
             AllegroBase(),
             ss()
     {
+
         for( int i = 0; i < 100; ++i )
         {
-            if ( ( i % 4 ) == 0 )
-            {
-                ss.Add( new Circle(  ) );
+            if(i==0){
+                ss.Add((new class Rectangle ));
+            }else if(i==1){
+                ss.Add(new Land);
             }
-            else if ( ( i % 4 ) == 1 )
-            {
-                ss.Add( new class Rectangle( ) );
-            }else if ( ( i % 4 ) == 2 )
-            {
-                ss.Add( new Triangle(  ) );
-            }else{
-                ss.Add( new Square( ) );
-            }
+            else{
+            ss.Add( new Goomba(  ) );}
         }
 
 
@@ -365,10 +329,12 @@ public:
     }
     virtual void Fps()
     {
+
         ss.Next();
+
         double dx_ =0, dy_=0;
-        if (IsPressed((ALLEGRO_KEY_UP))){dy_= -1;}
-        if(IsPressed((ALLEGRO_KEY_DOWN))){dy_= +1;}
+        //if (IsPressed((ALLEGRO_KEY_UP))){dy_= -1;}
+        //if(IsPressed((ALLEGRO_KEY_DOWN))){dy_= +1;}
         if(IsPressed((ALLEGRO_KEY_LEFT))){dx_= -1;}
         if(IsPressed((ALLEGRO_KEY_RIGHT))){dx_= +1;}
         if(IsPressed((ALLEGRO_KEY_LSHIFT))){
@@ -377,10 +343,11 @@ public:
         }
         humanSquare_.MoveBy(dx_,dy_);
 
-        ss.Collision();
+        //ss.Collision();
     }
     virtual void Draw()
     {
+
         ss.Draw();
         humanSquare_.draw();
 
