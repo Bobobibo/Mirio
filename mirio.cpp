@@ -42,10 +42,10 @@ public:
         return s;
     }
     void movef() {
-        dx = 1;
+        dx = -1;
         //dy=dy*d;
 
-        d = 1;
+        d = -1;
         x += dx;
         //y+=dy;
 
@@ -144,6 +144,7 @@ protected:
 public:
     Goomba() : Rectangle() {
         y = SCREEN_H - 215;
+        dx = -1;
     }
 
     virtual void draw() override {
@@ -151,9 +152,9 @@ public:
         al_draw_filled_rectangle(x, y, x + 15, y + 15, al_map_rgb(150, 75, 0));
     }
 
-    virtual void movef(){
+    virtual void movef() {
         x += dx * speed;
-        if (x >= SCREEN_W - 15 || x <= 0) {
+        if (x <= 0) {
             dx = -dx;
         }
     }
@@ -215,7 +216,7 @@ protected:
     double y = SCREEN_H - 240;
     double vy = 0;
     bool onGround = true;
-    const double gravity = 0.5;
+    const double gravity = 0.4 ;
 
 public:
     ControlledSquare() : Goomba() {}
@@ -269,12 +270,9 @@ public:
         }
     }
 
-    bool CheckCollision(const Goomba& goomba) const {
-        double gx = goomba.getX();
-        double gy = goomba.getY();
-        double gsize = 15;
-
-        return (x < gx + gsize && x + sx_ > gx && y < gy + gsize && y + sy_ > gy);
+    bool CheckCollision(const Goomba &goomba) {
+        return (x < goomba.getX() + 15 && x + sx_ > goomba.getX() &&
+                y < goomba.getY() + 15 && y + sy_ > goomba.getY());
     }
 };
 
@@ -299,24 +297,23 @@ public:
         if (IsPressed(ALLEGRO_KEY_LEFT)) { dx_ = -1; }
         if (IsPressed(ALLEGRO_KEY_RIGHT)) { dx_ = 1; }
         if (IsPressed(ALLEGRO_KEY_LSHIFT)) {
-            dx_ *= 10;
-            dy_ *= 10;
+            dx_ *= 3;
+            dy_ *= 3;
         }
         if (IsPressed(ALLEGRO_KEY_SPACE)) {
             humanSquare_.Jump();
         }
         humanSquare_.MoveBy(dx_, dy_);
+        humanSquare_.MoveBy(dx_, dy_);
 
-        for (int i = 0; i < 3; ++i) {
-            if (Goomba* goomba = dynamic_cast<Goomba*>(ss.figures[i])) {
+        // this is collision with goombas
+        for (int i = 2; i < MAXF; ++i) {
+            if (Goomba* goomba = dynamic_cast<Goomba*>(ss.getFigure(i))) {
                 if (humanSquare_.CheckCollision(*goomba)) {
                     exit(0);
                 }
             }
         }
-
-
-        // ss.Collision();
     }
 
     virtual void Draw() override {
