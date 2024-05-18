@@ -42,7 +42,7 @@ public:
         return s;
     }
     void movef() {
-        dx = d;
+        dx = 1;
         //dy=dy*d;
 
         d = 1;
@@ -136,226 +136,193 @@ public:
     }
 };
 
-class Goomba : public Rectangle
-{
+class Goomba : public Rectangle {
 protected:
     double s_ = randomSize();
+    double speed = 1.0;
 
 public:
-
-    Goomba() ://double s
-            Rectangle()
-    {
+    Goomba() : Rectangle() {
+        y = SCREEN_H - 215;
     }
-    //double getSize() const override { return s_; }
-    virtual void draw()
-    {
-        double size=s_;
-        x = rand() % SCREEN_W;
-        y =  SCREEN_H-215;
-        al_draw_filled_rectangle( x, y, x +15 , y +15,
-                                  al_map_rgb( 150, 75, 0) );
+
+    virtual void draw() override {
+        double size = s_;
+        al_draw_filled_rectangle(x, y, x + 15, y + 15, al_map_rgb(150, 75, 0));
+    }
+
+    virtual void movef(){
+        x += dx * speed;
+        if (x >= SCREEN_W - 15 || x <= 0) {
+            dx = -dx;
+        }
     }
 };
-const int MAXF =3;
 
-class ScreenSaver
-{
+const int MAXF = 7; // 1 Rectangle + 1 Land + 5 Goombas
+
+class ScreenSaver {
 private:
-    PFigure figures[MAXF];
     int size_;
 
 public:
-    ScreenSaver() :
-            size_( 0 )
-    {
-        memset( figures, 0, sizeof( figures ) );
+    ScreenSaver() : size_(0) {
+        memset(figures, 0, sizeof(figures));
     }
-    virtual ~ScreenSaver()
-    {
-        for( int i = 0; i < size_; ++i )
-        {
+
+    virtual ~ScreenSaver() {
+        for (int i = 0; i < size_; ++i) {
             delete figures[i];
-            figures[i] = 0;
+            figures[i] = nullptr;
         }
     }
-    void Draw()
-    {
-        al_clear_to_color( al_map_rgb( 0, 0, 0 ) );
-        for( int i = 0; i < size_; ++i )
-        {
+
+    void Draw() {
+        al_clear_to_color(al_map_rgb(0, 0, 0));
+        for (int i = 0; i < size_; ++i) {
             figures[i]->draw();
         }
     }
-    void Next()
-    {
 
-        for( int i = 0; i < size_; ++i )
-        {
+    void Next() {
+        for (int i = 0; i < size_; ++i) {
             figures[i]->movef();
-        }//Collision();
-
-
+        }
     }
-    void Add( Figure *f )
-    {
-        if ( size_ >= MAXF )
-        {
+
+    void Add(Figure *f) {
+        if (size_ >= MAXF) {
             return;
         }
-        figures[ size_ ] = f;
+        figures[size_] = f;
         ++size_;
     }
-public: void Collision() {
-        for (int i = 0; i < size_; ++i) {
-            for (int j = i + 1; j < size_; ++j) {
-                double x1 = figures[i]->getX();
-                double y1 = figures[i]->getY();
-                double sizex1 = figures[i]->getSize();
-                double sizey1 = figures[i]->getSize();
 
-                double x2 = figures[j]->getX();
-                double y2 = figures[j]->getY();
-                double sizex2 = figures[j]->getSize();
-                double sizey2 = figures[j]->getSize();
-
-                double left1 = x1;
-                double right1 = x1 + sizex1;
-                double top1 = y1;
-                double bottom1 = y1 + sizey1;
-
-                double left2 = x2;
-                double right2 = x2 + sizex2;
-                double top2 = y2;
-                double bottom2 = y2 + sizey2;
-                //double d1 = figures[j]->getD();
-
-
-                if (left1 < right2 && right1 > left2 && top1 < bottom2 && bottom1 > top2) {
-
-                    double dx = 2;
-                    double dy = 2;
-
-                    figures[i]->setX(figures[i]->getX() + dx);//to bounce off
-                    figures[i]->setY(figures[i]->getY() + dy);
-                    figures[j]->setX(figures[j]->getX() - dx);
-                    figures[j]->setY(figures[j]->getY() - dy);
-
-                    figures[i]->setDx(-figures[i]->getDx());//to change directions
-                    figures[i]->setDy(-figures[i]->getDy());
-                    figures[j]->setDx(-figures[j]->getDx());
-                    figures[j]->setDy(-figures[j]->getDy());
-                }
-            }
+    Figure* getFigure(int index) {
+        if (index >= 0 && index < size_) {
+            return figures[index];
         }
+        return nullptr;
     }
-    void DrawBackground(){
-        al_draw_filled_rectangle( 0, 0, SCREEN_W , SCREEN_H,
-                                  al_map_rgb( 4, 156, 216) );
-    };
 
+    PFigure figures[MAXF];
 };
-class ControlledSquare : public Goomba{
+class ControlledSquare : public Goomba {
 protected:
     double sy_ = 40;
     double sx_ = 20;
-    double x=0;
-    double y=SCREEN_H-240;
+    double x = 0;
+    double y = SCREEN_H - 240;
+    double vy = 0;
+    bool onGround = true;
+    const double gravity = 0.5;
+
 public:
+    ControlledSquare() : Goomba() {}
 
-    ControlledSquare():
-            Goomba(){
-
-    }
-    virtual void draw()
-    {
-
-        double sizex=sx_;
-        double sizey=sy_;
-        al_draw_filled_rectangle( x, y, x +sizex , y+sizey,
-                                  al_map_rgb( 229, 37, 33) );
+    virtual void draw() override {
+        double sizex = sx_;
+        double sizey = sy_;
+        al_draw_filled_rectangle(x, y, x + sizex, y + sizey, al_map_rgb(229, 37, 33));
     }
 
-    void CheckWin(double x, double y){
-        if((x>=SCREEN_W)){
-            cout<<"YOU WON"<<endl;
+    void CheckWin(double x, double y) {
+        if (x >= SCREEN_W) {
+            cout << "YOU WON" << endl;
         }
     }
 
-    void MoveBy(double dx_, double dy_){
-        dx=dx_;
-        dy=dy_;
-        x+=dx;
-        y+=dy;
-        if((x<=0.0)||(x+s_>= SCREEN_W)){
-            dx*=0;
-        }if((y<=0.0)||(y+s_>= SCREEN_H)) {
+    void MoveBy(double dx_, double dy_) {
+        dx = dx_;
+        if (onGround) {
+            dy = dy_;
+        }
+        x += dx;
+        y += dy;
+
+
+        if (!onGround) {
+            vy += gravity;
+            y += vy;
+        }
+
+
+        if (y >= SCREEN_H - sy_ - 200) {
+            y = SCREEN_H - sy_ - 200;
+            vy = 0;
+            onGround = true;
+        }
+
+        if ((x <= 0.0) || (x + sx_ >= SCREEN_W)) {
+            dx *= 0;
+        }
+        if ((y <= 0.0) || (y + sy_ >= SCREEN_H)) {
             dy *= 0;
         }
-        CheckWin(x,y);
-
+        CheckWin(x, y);
     }
 
+    void Jump() {
+        if (onGround) {
+            vy = -10;
+            onGround = false;
+        }
+    }
 
+    bool CheckCollision(const Goomba& goomba) const {
+        double gx = goomba.getX();
+        double gy = goomba.getY();
+        double gsize = 15;
 
+        return (x < gx + gsize && x + sx_ > gx && y < gy + gsize && y + sy_ > gy);
+    }
 };
-//ScreenSaver ss;
-class AllegroApp:public AllegroBase
-{
+
+class AllegroApp : public AllegroBase {
 private:
     ControlledSquare humanSquare_;
     ScreenSaver ss;
-    //Figure.randomsize();
 
 public:
-    AllegroApp():
-            AllegroBase(),
-            ss()
-    {
-
-        for( int i = 0; i < 100; ++i )
-        {
-            if(i==0){
-                ss.Add((new class Rectangle ));
-            }else if(i==1){
-                ss.Add(new Land);
-            }
-            else{
-            ss.Add( new Goomba(  ) );}
+    AllegroApp() : AllegroBase(), ss() {
+        ss.Add(new class Rectangle());
+        ss.Add(new Land());
+        for (int i = 0; i < 5; ++i) {
+            ss.Add(new Goomba());
         }
-
-
-
     }
-    virtual void Fps()
-    {
 
+    virtual void Fps() override {
         ss.Next();
 
-        double dx_ =0, dy_=0;
-        //if (IsPressed((ALLEGRO_KEY_UP))){dy_= -1;}
-        //if(IsPressed((ALLEGRO_KEY_DOWN))){dy_= +1;}
-        if(IsPressed((ALLEGRO_KEY_LEFT))){dx_= -1;}
-        if(IsPressed((ALLEGRO_KEY_RIGHT))){dx_= +1;}
-        if(IsPressed((ALLEGRO_KEY_LSHIFT))){
-            dx_*=10;
-            dy_*=10;
+        double dx_ = 0, dy_ = 0;
+        if (IsPressed(ALLEGRO_KEY_LEFT)) { dx_ = -1; }
+        if (IsPressed(ALLEGRO_KEY_RIGHT)) { dx_ = 1; }
+        if (IsPressed(ALLEGRO_KEY_LSHIFT)) {
+            dx_ *= 10;
+            dy_ *= 10;
         }
-        humanSquare_.MoveBy(dx_,dy_);
+        if (IsPressed(ALLEGRO_KEY_SPACE)) {
+            humanSquare_.Jump();
+        }
+        humanSquare_.MoveBy(dx_, dy_);
 
-        //ss.Collision();
+        for (int i = 0; i < 3; ++i) {
+            if (Goomba* goomba = dynamic_cast<Goomba*>(ss.figures[i])) {
+                if (humanSquare_.CheckCollision(*goomba)) {
+                    exit(0);
+                }
+            }
+        }
+
+
+        // ss.Collision();
     }
-    virtual void Draw()
-    {
 
+    virtual void Draw() override {
         ss.Draw();
         humanSquare_.draw();
-
     }
-
-
-
-
 };
 
 
