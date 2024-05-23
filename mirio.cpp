@@ -43,14 +43,6 @@ public:
     }
     double getX() const { return x; }
     double getY() const { return y; }
-    double getDx() const { return dx; }
-    double getDy() const { return dy; }
-    double getSize() const { return s; }
-
-    void setDx(double dx1) { dx = dx1; }
-    void setDy(double dy1) { dy = dy1; }
-    void setX(double x1) { x = x1; }
-    void setY(double y1) { y = y1; }
 
 
     virtual void draw()=0;
@@ -277,7 +269,7 @@ public:
         al_draw_filled_rectangle(x, y, x + sizex, y + sizey, al_map_rgb(229, 37, 33));
     }
 
-    void CheckWin(double x, double y) {
+    void CheckWin(double x) {
         if (x >= SCREEN_W-200) {
             cout << "YOU WON (crossed the flag) :D" << endl;
             sleep(5);
@@ -321,7 +313,7 @@ public:
         if ((y <= 0.0) || (y + sy_ >= SCREEN_H)) {
             dy *= 0;
          }
-        CheckWin(x, y);
+        CheckWin(x);
 
     }
 
