@@ -2,6 +2,7 @@
 #include "AllegroBase.hpp"
 #include <windows.h>
 #include <cstdlib>
+#include <unistd.h>
 
 using namespace std;
 
@@ -41,36 +42,11 @@ public:
         s= rand() % 1920;
         return s;
     }
-    void movef() {
-        dx = -1;
-        //dy=dy*d;
 
+    virtual void movef() {
+        dx = -1;
         d = -1;
         x += dx;
-        //y+=dy;
-
-        /*if ((x >= SCREEN_W - 1.0))
-        {
-            x -= dx;
-            Reset();
-
-            dx=-1.0  ;
-            //randomSize();
-            //randomColor();
-        }else if(x  <=1.0 ){
-            x -= dx;
-            Reset();
-
-            dx=1.0  ;
-            //randomSize();
-            //randomColor();
-
-        }*/
-
-
-
-
-
 
     }
     double getX() const { return x; }
@@ -78,12 +54,12 @@ public:
     double getDx() const { return dx; }
     double getDy() const { return dy; }
     double getSize() const { return s; }
-    //double getD() const { return d; }
+
     void setDx(double dx1) { dx = dx1; }
     void setDy(double dy1) { dy = dy1; }
     void setX(double x1) { x = x1; }
     void setY(double y1) { y = y1; }
-    //double getSize() const{return s;}
+
 
     virtual void draw()=0;
 
@@ -107,7 +83,6 @@ public:
             Figure()
     {
     }
-    //double getSize() const override { return sx_; }
     virtual void draw()
     {
         al_draw_filled_rectangle( 0, 0, SCREEN_W , SCREEN_H,
@@ -123,16 +98,85 @@ protected:
 
 public:
 
-    Land() ://double s
+    Land() :
             Rectangle()
     {
     }
-    //double getSize() const override { return s_; }
+
     virtual void draw()
     {
 
         al_draw_filled_rectangle( 0, SCREEN_H-200, SCREEN_W , SCREEN_H,
                                   al_map_rgb( 67, 176, 71) );
+    }
+};
+class Platform : public Rectangle {
+public:
+    Platform() : Rectangle() {
+        y = SCREEN_H - 300;
+        sx_ = 200;
+        sy_ = 20;
+        x = 300;
+    }
+
+    virtual void draw() override {
+        al_draw_filled_rectangle(x, y, x + sx_, y + sy_, al_map_rgb(203, 79, 15));
+    }
+
+    virtual  void movef() override {
+        //not moving
+    }
+};
+class Platform2 : public Rectangle {
+public:
+    Platform2() : Rectangle() {
+        y = SCREEN_H - 300;
+        sx_ = 200;
+        sy_ = 20;
+        x = 1000;
+    }
+
+    virtual void draw() override {
+        al_draw_filled_rectangle(x, y, x + sx_, y + sy_, al_map_rgb(203, 79, 15));
+    }
+
+    virtual  void movef() override {
+        //not moving
+    }
+};
+
+class Cloud : public Rectangle {
+public:
+    Cloud() : Rectangle() {
+        y = 300;
+        sx_ = rand() % 100;
+
+        x = rand() % SCREEN_W;
+    }
+
+    virtual void draw() override {
+        al_draw_filled_circle(x, y, sx_, al_map_rgb(255, 255, 253));
+    }
+
+    virtual  void movef() override {
+        //not moving
+    }
+};
+class Flag : public Rectangle {
+public:
+    Flag() : Rectangle() {
+        y = SCREEN_H;
+        sx_ = 15;
+
+        x = SCREEN_W-200;
+    }
+
+    virtual void draw() override {
+        al_draw_filled_rectangle(x, 0, x + sx_, SCREEN_H-200, al_map_rgb(0, 171, 3));
+    }
+
+    virtual  void movef() override {
+        //not moving
     }
 };
 
@@ -160,7 +204,7 @@ public:
     }
 };
 
-const int MAXF = 7; // 1 Rectangle + 1 Land + 5 Goombas
+const int MAXF = 40; // 1 Rectangle + 1 Land+ 2 platform + 7 clouds + 10 Goombas
 
 class ScreenSaver {
 private:
@@ -199,12 +243,26 @@ public:
         ++size_;
     }
 
+    void Remove(int index) {
+        if (index < 0 || index >= size_) {
+            return;
+        }
+        delete figures[index];
+        for (int i = index; i < size_ - 1; ++i) {
+            figures[i] = figures[i + 1];
+        }
+        figures[size_ - 1] = nullptr;
+        --size_;
+    }
+
     Figure* getFigure(int index) {
         if (index >= 0 && index < size_) {
             return figures[index];
         }
         return nullptr;
     }
+
+
 
     PFigure figures[MAXF];
 };
@@ -228,9 +286,11 @@ public:
     }
 
     void CheckWin(double x, double y) {
-        if (x >= SCREEN_W) {
-            cout << "YOU WON" << endl;
-        }
+        if (x >= SCREEN_W-200) {
+            cout << "YOU WON (crossed the flag) :D" << endl;
+            sleep(5);
+            exit(0);
+          }
     }
 
     void MoveBy(double dx_, double dy_) {
@@ -254,13 +314,23 @@ public:
             onGround = true;
         }
 
+        if ((y <= SCREEN_H - sy_ - 300 && x>=300 && x<=300+200 )||(y <= SCREEN_H - sy_ - 300 && x>=1000 && x<=1000+200 )){
+            y = SCREEN_H - sy_ - 300;
+            vy = 0;
+            onGround = true;
+        }else if((y == SCREEN_H - sy_ - 300 && (x>1000 || x<1000+200 ))||(y == SCREEN_H - sy_ - 300 && (x>1000 || x<1000+200 ))){
+            onGround=false;}
+
+
+
         if ((x <= 0.0) || (x + sx_ >= SCREEN_W)) {
             dx *= 0;
         }
         if ((y <= 0.0) || (y + sy_ >= SCREEN_H)) {
             dy *= 0;
-        }
+         }
         CheckWin(x, y);
+
     }
 
     void Jump() {
@@ -274,20 +344,42 @@ public:
         return (x < goomba.getX() + 15 && x + sx_ > goomba.getX() &&
                 y < goomba.getY() + 15 && y + sy_ > goomba.getY());
     }
+
+    bool CheckJumpOn(const Goomba &goomba) {
+        return (y + sy_ >= goomba.getY() && vy > 0 &&
+                x + sx_ > goomba.getX() && x <  goomba.getX() + 15);
+    }
+    void Bounce() {
+        vy = -5;
+    }
+
 };
 
 class AllegroApp : public AllegroBase {
 private:
     ControlledSquare humanSquare_;
     ScreenSaver ss;
+    int goombaCount_;
 
 public:
+
     AllegroApp() : AllegroBase(), ss() {
         ss.Add(new class Rectangle());
         ss.Add(new Land());
-        for (int i = 0; i < 5; ++i) {
-            ss.Add(new Goomba());
+        ss.Add(new Platform());
+        ss.Add(new Platform2());
+        ss.Add(new Flag());
+        for (int i = 4; i < 9; ++i) {
+            ss.Add(new Cloud());
         }
+        for (int i = 11; i < 24 ; ++i) {
+            ss.Add(new Goomba());
+
+
+        }
+        goombaCount_=13;//delta from goombas creation ( beginning i and second i)
+        cout<< " Goomba count:"<<goombaCount_<<endl;
+
     }
 
     virtual void Fps() override {
@@ -304,17 +396,31 @@ public:
             humanSquare_.Jump();
         }
         humanSquare_.MoveBy(dx_, dy_);
-        humanSquare_.MoveBy(dx_, dy_);
+
+
 
         // this is collision with goombas
-        for (int i = 2; i < MAXF; ++i) {
-            if (Goomba* goomba = dynamic_cast<Goomba*>(ss.getFigure(i))) {
-                if (humanSquare_.CheckCollision(*goomba)) {
-                    exit(0);
+        for (int i = MAXF - 1; i >= 2; --i) {
+            if (Goomba *goomba = dynamic_cast<Goomba *>(ss.getFigure(i))) {
+                if (humanSquare_.CheckJumpOn(*goomba)) {
+                    ss.Remove(i); // Remove Goomba
+                   goombaCount_--;
+                    cout<< " Goomba count:"<<goombaCount_<<endl;
+
+                    humanSquare_.Bounce(); // Bounce
+                } else if (humanSquare_.CheckCollision(*goomba)) {
+                    cout << "YOU LOST :(" << endl;
+                    exit(0); //lose
+                }
+                if (goombaCount_ == 0) {
+                    cout << "YOU WON (destroyed the goombas) :)" << endl;
+                    sleep(5);
+                    exit(0); //victory
                 }
             }
         }
     }
+
 
     virtual void Draw() override {
         ss.Draw();
@@ -335,6 +441,5 @@ int main(int argc, char **argv)
     {
         return 1;
     }
-    app.Run();
-    return 0;
+    app.Run();     return 0;
 };
