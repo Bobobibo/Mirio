@@ -16,9 +16,6 @@ protected:
     double d;
     double x = rand() % SCREEN_W;
     double y = rand() % SCREEN_H;
-    double r = rand() % 256;
-    double g = rand() % 256;
-    double b = rand() % 256;
 
     double s;
 
@@ -32,11 +29,6 @@ public:
     void Reset()
     {
         d=1;
-    }
-    void randomColor() {
-        r = rand() % 256;
-        g = rand() % 256;
-        b = rand() % 256;
     }
     double randomSize(){
         s= rand() % 1920;
@@ -204,7 +196,7 @@ public:
     }
 };
 
-const int MAXF = 40; // 1 Rectangle + 1 Land+ 2 platform + 7 clouds + 10 Goombas
+const int MAXF = 40; // 1 Rectangle + 1 Land+ 2 platform + 7 clouds + 13 Goombas
 
 class ScreenSaver {
 private:
