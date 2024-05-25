@@ -298,7 +298,7 @@ public:
             onGround = true;
         }
 
-        if ((y <= SCREEN_H - sy_ - 300 &&  (x>=300 && x<=300+200 ))||(y <= SCREEN_H - sy_ - 300 && (x>=1000 && x<=1000+200) )){
+        if ((y <=  SCREEN_H - sy_ - 300 &&  (x>=300 && x<=300+200 ))||(y <= SCREEN_H - sy_ - 300 && (x>=1000 && x<=1000+200) )){
              y = SCREEN_H - sy_ - 300;
             vy = 0;
             onGround = true;
@@ -318,7 +318,11 @@ public:
     }
 
     void Jump() {
-        if (onGround) {
+        if((x>=300 && x<=300+200 )||((x>=1000 && x<=1000+200) )){
+            vy = -5;
+            onGround = false;
+        }
+        else if (onGround) {
             vy = -10;
             onGround = false;
         }
