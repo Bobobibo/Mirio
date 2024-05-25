@@ -14,7 +14,7 @@ protected:
     double dx=1.0;
     double dy=1.0;
     double d;
-    double x = rand() % SCREEN_W;
+    double x = rand() % SCREEN_W;// +50;
     double y = rand() % SCREEN_H;
 
     double s;
@@ -27,7 +27,7 @@ public:
     {
     }
     void Reset()
-    {
+     {
         d=1;
     }
     double randomSize(){
@@ -188,14 +188,14 @@ public:
     }
 };
 
-const int MAXF = 40; // 1 Rectangle + 1 Land+ 2 platform + 7 clouds + 13 Goombas
+const int MAXF = 40; // 1 Rectangle + 1 Land+ 2 platform + 7 clouds + x Goombas
 
 class ScreenSaver {
 private:
     int size_;
 
 public:
-    ScreenSaver() : size_(0) {
+      ScreenSaver() : size_(0) {
         memset(figures, 0, sizeof(figures));
     }
 
@@ -298,11 +298,11 @@ public:
             onGround = true;
         }
 
-        if ((y <= SCREEN_H - sy_ - 300 && x>=300 && x<=300+200 )||(y <= SCREEN_H - sy_ - 300 && x>=1000 && x<=1000+200 )){
-            y = SCREEN_H - sy_ - 300;
+        if ((y <= SCREEN_H - sy_ - 300 &&  (x>=300 && x<=300+200 ))||(y <= SCREEN_H - sy_ - 300 && (x>=1000 && x<=1000+200) )){
+             y = SCREEN_H - sy_ - 300;
             vy = 0;
             onGround = true;
-        }else if((y == SCREEN_H - sy_ - 300 && (x>1000 || x<1000+200 ))||(y == SCREEN_H - sy_ - 300 && (x>1000 || x<1000+200 ))){
+        }else if((y == SCREEN_H - sy_ - 300 && (x<300 || x>300+200 ))||(y == SCREEN_H - sy_ - 300 && (x<1000 || x>1000+200 ))){
             onGround=false;}
 
 
