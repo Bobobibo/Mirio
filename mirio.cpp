@@ -70,7 +70,7 @@ public:
     virtual void draw()
     {
         al_draw_filled_rectangle( 0, 0, SCREEN_W , SCREEN_H,
-                                  al_map_rgb( 4, 156, 216) );
+                                  al_map_rgb(94, 145, 254)); //( 4, 156, 216) );
 
     }
 
@@ -318,11 +318,11 @@ public:
     }
 
     void Jump() {
-        if((x>=300 && x<=300+200 )||((x>=1000 && x<=1000+200) )){
+        /*if((x>=300 && x<=300+200 )||((x>=1000 && x<=1000+200) )){
             vy = -5;
             onGround = false;
         }
-        else if (onGround) {
+        else*/ if (onGround) {
             vy = -10;
             onGround = false;
         }
